@@ -1,0 +1,26 @@
+.stopwatch__btn {
+    vertical-align: middle;
+    border: none;
+    margin-left: 5px;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    &--start {
+        background-color: $green;
+        &:hover {
+            background-color: $dark-green;
+        }
+    }
+    &--pause {
+        background-color: $blue;
+        &:hover {
+            background-color: $dark-blue;
+        }
+    }
+    &--stop {
+        background-color: $red;
+        &:hover {
+            background-color: $dark-red;
+        }
+    }
+}
