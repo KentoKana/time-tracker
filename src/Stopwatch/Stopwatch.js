@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import TimeDisplay from './TimeDisplay';
 import EditableTimeDisplay from './EditableTimeDisplay';
 import StopwatchButton from './StopwatchButton';
@@ -53,7 +53,7 @@ const Stopwatch = (props) => {
         return timeObj;
     }
 
-    const startStopwatch = () => {
+    const startStopwatch = useCallback(() => {
         if (!isOn) {
             if (!initialTime.current) {
                 // Get the UTC time at the time of starting the timer
@@ -67,27 +67,27 @@ const Stopwatch = (props) => {
                 }, 1000)
             }
         }
-    }
+    }, [isOn]);
 
-    const pauseStopwatch = () => {
+    const pauseStopwatch = useCallback(() => {
         if (timeInterval.current && isOn) {
             timeTracker.current = Date.now() - initialTime.current + timeTracker.current;
             initialTime.current = null;
             clearInterval(timeInterval.current);
             timeInterval.current = null;
         }
-    }
+    }, [isOn]);
 
-    const stopStopwatch = () => {
+    const stopStopwatch = useCallback(() => {
         setIsOn(false);
         pauseStopwatch();
         timeTracker.current = 0;
         setElapsedTime(0);
-    }
+    }, [pauseStopwatch]);
 
-    const handleIsOn = () => {
+    const handleIsOn = useCallback(() => {
         !isOn ? setIsOn(true) : setIsOn(false);
-    }
+    }, [isOn]);
 
     //***** End Stopwatch Timer Logic *****//
 
@@ -97,16 +97,17 @@ const Stopwatch = (props) => {
 
     // State handler for determining whether or not the timer display is editable.
     let [isEditable, setEditStatus] = useState(false);
-    const handleEditStatus = (e) => {
+    const handleEditStatus = useCallback((e) => {
         if (targetNode.current !== null && targetNode.current.contains(e.target)) {
             setIsOn(false);
             setEditStatus(true);
             pauseStopwatch();
-            return isEditable;
         } else {
             setEditStatus(false);
         }
-    }
+        return isEditable;
+    }, [isEditable, pauseStopwatch]);
+
     //****** End Edit Status Logic *******//
 
     // Function to render either the editable stopwatch display or the normal display
@@ -116,6 +117,8 @@ const Stopwatch = (props) => {
                 <EditableTimeDisplay
                     targetNode={targetNode}
                     displayTime={displayTime.current}
+                    setEditStatus={handleEditStatus}
+                    isEditable={isEditable}
                 />
             )
 

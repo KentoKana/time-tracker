@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useRef, useCallback } from 'react'
 
 const StopwatchButton = (props) => {
 
@@ -22,15 +22,15 @@ const StopwatchButton = (props) => {
             props.toggleIsOn();
             props.pauseStopwatch();
         }
-    }
+    };
 
     const handleStopBtnClick = () => {
         label.current = <i className="fas fa-play"></i>
         modClassName.current = '--start';
         props.stopStopwatch();
-    }
+    };
 
-    const toggleBtnStyling = () => {
+    const toggleBtnStyling = useCallback(() => {
         if (props.isOn === false) {
             label.current = <i className="fas fa-play"></i>
             modClassName.current = '--start';
@@ -38,7 +38,7 @@ const StopwatchButton = (props) => {
             label.current = <i className="fas fa-pause"></i>
             modClassName.current = '--pause';
         }
-    }
+    }, [props])
 
     toggleBtnStyling();
 

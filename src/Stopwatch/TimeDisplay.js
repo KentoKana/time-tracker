@@ -28,6 +28,7 @@ const TimeDisplay = (props) => {
         }
 
         Object.keys(timeObj).forEach(e => {
+            // Refactor this so that it's not doing a Regex check every render.
             let regex = /^0[0-9].*$/
             if (timeObj[e] < 10 && !regex.test(timeObj[e])) {
                 timeObj[e] = "0" + timeObj[e];
