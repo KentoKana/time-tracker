@@ -3,7 +3,6 @@ import TimeDisplay from './TimeDisplay';
 import EditableTimeDisplay from './EditableTimeDisplay';
 import StopwatchButton from './StopwatchButton';
 
-
 const Stopwatch = (props) => {
     //********************************//
     //***** Initialize Variables *****//
@@ -11,11 +10,16 @@ const Stopwatch = (props) => {
 
     // Init timer variables
     let initialTime = useRef();
-    let [elapsedTime, setElapsedTime] = useState(0);
+    let [elapsedTime, setElapsedTime] = useState({
+        hours: 0,
+        minutes: 0,
+        seconds: 0,
+    });
     let timeInterval = useRef();
     let [isOn, setIsOn] = useState(false);
 
-    // Keeps track of elapsed time when stopwatch is paused.
+    // Keeps track of the time passed in milliseconds. 
+    // Set this variable to change the displayed time.
     let timeTracker = useRef();
     timeTracker.current = timeTracker.current ? timeTracker.current : 0;
 
@@ -28,6 +32,13 @@ const Stopwatch = (props) => {
     // Function to get current Display Time
     const getDisplayTime = (currentTime) => {
         return displayTime.current = currentTime;
+    }
+
+    // Get Edited time
+    let editedTime = useRef();
+    const getEditedTime = (time) => {
+        editedTime.current = time;
+        return editedTime.current;
     }
 
     //*********************************************//
@@ -82,7 +93,7 @@ const Stopwatch = (props) => {
         setIsOn(false);
         pauseStopwatch();
         timeTracker.current = 0;
-        setElapsedTime(0);
+        setElapsedTime({ hours: 0, minutes: 0, seconds: 0 });
     }, [pauseStopwatch]);
 
     const handleIsOn = useCallback(() => {
@@ -94,8 +105,22 @@ const Stopwatch = (props) => {
     //****************************************//
     //***** Set Edit Status Logic Here *******//
     //****************************************//
+    /**
+    * Function to convert string time into MS
+    * @param {string} timeString - time in string format (hh:mm:ss);
+    */
+    const convertTimeToMS = (timeString) => {
+        let timeObj = { hours: 0, minutes: 0, seconds: 0 }
+        if (timeString) {
+            let timeArray = timeString.split(':');
+            timeObj.hours = timeArray[0];
+            timeObj.minutes = timeArray[1];
+            timeObj.seconds = timeArray[2];
+        }
+        return (timeObj.hours * 3600000) + (timeObj.minutes * 60000) + (timeObj.seconds * 1000);
+    }
 
-    // State handler for determining whether or not the timer display is editable.
+    // State handler for determining whether or not the timer display is editable. 
     let [isEditable, setEditStatus] = useState(false);
     const handleEditStatus = useCallback((e) => {
         if (targetNode.current !== null && targetNode.current.contains(e.target)) {
@@ -103,7 +128,11 @@ const Stopwatch = (props) => {
             setEditStatus(true);
             pauseStopwatch();
         } else {
-            setEditStatus(false);
+            if (isEditable) {
+                timeTracker.current = convertTimeToMS(editedTime.current);
+                let userEditedTime = convertMS(timeTracker.current)
+                setElapsedTime(userEditedTime);
+            } setEditStatus(false);
         }
         return isEditable;
     }, [isEditable, pauseStopwatch]);
@@ -119,13 +148,15 @@ const Stopwatch = (props) => {
                     displayTime={displayTime.current}
                     setEditStatus={handleEditStatus}
                     isEditable={isEditable}
+                    setElapsedTime={setElapsedTime}
+                    getEditedTime={getEditedTime}
                 />
             )
 
         } else {
             return (
                 <TimeDisplay
-                    getElapsedTime={elapsedTime}
+                    setElapsedTime={elapsedTime}
                     targetNode={targetNode}
                     isEditable={isEditable}
                     setEditStatus={handleEditStatus}
@@ -142,6 +173,7 @@ const Stopwatch = (props) => {
             document.removeEventListener("mousedown", handleEditStatus);
         };
     }, [handleEditStatus]);
+
 
     return (
         <>

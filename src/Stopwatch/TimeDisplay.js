@@ -38,7 +38,7 @@ const TimeDisplay = (props) => {
         return timeObj;
     }
 
-    timeObj = formatTime(props.getElapsedTime);
+    timeObj = formatTime(props.setElapsedTime);
     display.current = `${timeObj.hours}:${timeObj.minutes}:${timeObj.seconds}`;
     props.displayTime(display.current);
 

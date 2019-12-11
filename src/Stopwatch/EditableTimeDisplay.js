@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const EditableTimeDisplay = (props) => {
     const handleKeyPress = (e) => {
@@ -7,8 +7,16 @@ const EditableTimeDisplay = (props) => {
             props.setEditStatus(false);
         }
     }
+
+    let [editedTime, handleEdittedTime] = useState(props.displayTime)
+
+    const handleChange = (e) => {
+        handleEdittedTime(e.target.value);
+    }
+    props.getEditedTime(editedTime);
+
     return (
-        <input ref={props.targetNode} className="stopwatch__display" type="text" defaultValue={props.displayTime} onKeyPress={handleKeyPress} />
+        <input ref={props.targetNode} className="stopwatch__display" type="text" onChange={handleChange} defaultValue={props.displayTime} onKeyPress={handleKeyPress} />
     )
 }
 
